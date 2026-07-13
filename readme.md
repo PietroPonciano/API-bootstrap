@@ -15,6 +15,7 @@ O foco **não é gerar uma aplicação completa**, mas entregar um projeto organ
 * Utilizar as ferramentas oficiais de cada stack.
 * Permitir evolução para novas stacks sem alterar a arquitetura.
 * Separar completamente a interface do motor de geração.
+* Suportar diferentes sistemas operacionais utilizando a mesma base de código.
 
 ---
 
@@ -67,6 +68,7 @@ core/
 ├── generator/
 ├── filesystem/
 ├── commands/
+├── platform/
 ├── stacks/
 ├── features/
 ├── logger/
@@ -78,6 +80,156 @@ templates/
 ├── node-express-prisma/
 └── fastify-prisma/
 ```
+
+---
+
+# Suporte Multiplataforma
+
+O API Bootstrap será desenvolvido utilizando Electron, permitindo gerar projetos em diferentes sistemas operacionais utilizando a mesma base de código.
+
+Sistemas suportados:
+
+* Windows
+* macOS
+* Linux
+
+A maior parte do projeto será compartilhada entre todas as plataformas.
+
+As diferenças específicas de cada sistema serão isoladas através de uma camada própria.
+
+---
+
+# Platform Layer
+
+A camada de plataforma será responsável por funcionalidades dependentes do sistema operacional.
+
+Estrutura:
+
+```text
+core/
+
+platform/
+
+├── index.js
+├── windows.js
+├── macos.js
+└── linux.js
+```
+
+Responsabilidades:
+
+* Abrir pasta do projeto.
+* Abrir terminal.
+* Detectar ferramentas instaladas.
+* Verificar Node.js.
+* Verificar npm.
+* Verificar Git.
+* Executar comandos específicos do sistema.
+
+---
+
+## Interface de Plataforma
+
+O Core não executará comandos específicos diretamente.
+
+Exemplo incorreto:
+
+```javascript
+exec("explorer .");
+```
+
+ou:
+
+```javascript
+exec("open .");
+```
+
+A aplicação utiliza uma interface única:
+
+```javascript
+platform.openFolder(path);
+
+platform.openTerminal();
+
+platform.checkNode();
+
+platform.checkGit();
+```
+
+Cada sistema possui sua própria implementação.
+
+---
+
+## Exemplos
+
+Windows:
+
+```javascript
+class WindowsPlatform {
+
+    openFolder(path) {
+        exec(`explorer "${path}"`);
+    }
+
+}
+```
+
+macOS:
+
+```javascript
+class MacPlatform {
+
+    openFolder(path) {
+        exec(`open "${path}"`);
+    }
+
+}
+```
+
+Linux:
+
+```javascript
+class LinuxPlatform {
+
+    openFolder(path) {
+        exec(`xdg-open "${path}"`);
+    }
+
+}
+```
+
+---
+
+# Gerenciamento de comandos
+
+Comandos executados pelo gerador também serão abstraídos.
+
+Estrutura:
+
+```text
+core/
+
+commands/
+
+├── CommandRunner.js
+├── npm.js
+├── git.js
+└── sequelize.js
+```
+
+Exemplo:
+
+```javascript
+commands.sequelize.init();
+```
+
+Internamente:
+
+```bash
+npx sequelize-cli init
+```
+
+Dessa forma, qualquer ajuste futuro fica isolado em um único local.
 
 ---
 
@@ -93,6 +245,10 @@ Electron IPC
 ↓
 
 Core Generator
+
+↓
+
+Platform Layer
 
 ↓
 
@@ -118,6 +274,52 @@ Projeto criado
 A interface apenas coleta as informações do usuário.
 
 Toda a geração acontece dentro do Core.
+
+---
+
+# Build da aplicação
+
+O Electron permite gerar versões específicas para cada sistema operacional.
+
+## Windows
+
+```bash
+npm run build:win
+```
+
+Resultado:
+
+```text
+API-Bootstrap.exe
+```
+
+---
+
+## macOS
+
+```bash
+npm run build:mac
+```
+
+Resultado:
+
+```text
+API-Bootstrap.dmg
+```
+
+---
+
+## Linux
+
+```bash
+npm run build:linux
+```
+
+Resultado:
+
+```text
+API-Bootstrap.AppImage
+```
 
 ---
 
