@@ -19,66 +19,37 @@ O foco **não é gerar uma aplicação completa**, mas entregar um projeto organ
 
 ---
 
-# Arquitetura
-
-O projeto será dividido em quatro módulos principais.
-
-```text
-api-bootstrap/
-│
-├── app/                # Interface (React)
-├── electron/           # Processo principal do Electron
-├── core/               # Motor de geração
-└── templates/          # Templates das stacks
-```
-
-O **Core** nunca deve depender do Electron.
-
-No futuro ele poderá ser utilizado por:
-
-* CLI
-* API
-* Interface Web
-* Electron
-
----
-
 # Estrutura do projeto
 
 ```text
 api-bootstrap/
-
-app/
-│
-├── pages/
-├── components/
-├── contexts/
-├── hooks/
-├── services/
-└── types/
-
-electron/
-│
-├── main.js
-├── preload.js
-└── ipc/
-
-core/
-│
-├── generator/
-├── filesystem/
-├── commands/
-├── platform/
-├── stacks/
-├── features/
-├── logger/
-└── utils/
-
-templates/
-│
-├── node-express-sequelize/
-├── node-express-prisma/
-└── fastify-prisma/
+├── build/ # Arquivos de build e ícones da aplicação
+├── resources/ # Recursos estáticos da aplicação, como ícones
+├── src/
+│   ├── core/ # Módulos de lógica de negócio e serviços centrais
+│   │   ├── logger/ # Módulo para gerenciamento de logs
+│   │   └── system/ # Módulo para interações com o sistema operacional
+│   ├── main/ # Código do processo principal do Electron (backend)
+│   │   ├── ipc/ # Módulos para comunicação interprocessos (IPC)
+│   │   └── index.js # Ponto de entrada do processo principal
+│   ├── preload/ # Código do script de pré-carregamento do Electron
+│   │   └── index.js # Ponto de entrada do script de pré-carregamento
+│   └── renderer/ # Código do processo de renderização do Electron (frontend React)
+│       ├── src/ # Código-fonte da aplicação React
+│       │   ├── assets/ # Ativos estáticos como CSS e SVGs
+│       │   ├── components/ # Componentes React reutilizáveis
+│       │   ├── App.jsx # Componente principal da aplicação React
+│       │   └── main.jsx # Ponto de entrada da aplicação React
+│       └── index.html # Arquivo HTML principal da interface do usuário
+├── .editorconfig # Configurações para editores de texto
+├── .gitignore # Arquivos e diretórios a serem ignorados pelo Git
+├── .prettierignore # Arquivos e diretórios a serem ignorados pelo Prettier
+├── .prettierrc.yaml # Configurações do Prettier
+├── electron-builder.yml # Configurações do Electron Builder para empacotamento
+├── electron.vite.config.mjs # Configurações do Vite para Electron
+├── eslint.config.mjs # Configurações do ESLint
+├── package-lock.json # Bloqueio de dependências do npm
+└── package.json # Metadados do projeto e scripts de execução
 ```
 
 ---
