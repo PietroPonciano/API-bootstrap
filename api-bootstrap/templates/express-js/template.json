@@ -1,0 +1,31 @@
+{
+  "id": "express-js",
+  "name": "Express JS",
+  "version": "1.0.0",
+  "description": "Express API Template",
+  "author": "API Bootstrap",
+  "engine": "node",
+  "language": "javascript",
+  "variables": [
+    {
+      "name": "PROJECT_NAME",
+      "required": true,
+      "default": "my-api"
+    },
+    {
+      "name": "AUTHOR",
+      "required": false,
+      "default": ""
+    },
+    {
+      "name": "DESCRIPTION",
+      "required": false,
+      "default": ""
+    },
+    {
+      "name": "YEAR",
+      "required": false,
+      "default": "2026"
+    }
+  ]
+}
