@@ -4,7 +4,7 @@ const router = Router();
 
 router.get('/', (req, res) => {
   res.json({
-    project: '{{PROJECT_NAME}}',
+    project: 'my-api',
     status: 'running',
   });
 });
