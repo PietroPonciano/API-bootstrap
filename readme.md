@@ -1,945 +1,256 @@
 # API Bootstrap
 
-Gerador de projetos backend para Node.js.
-
-O objetivo do projeto é fornecer uma aplicação desktop capaz de gerar uma base de API pronta para desenvolvimento, padronizando a estrutura do projeto, configuração do banco de dados, modelagem inicial e recursos opcionais.
-
-O foco **não é gerar uma aplicação completa**, mas entregar um projeto organizado e pronto para começar o desenvolvimento.
+> Um gerador de projetos backend para Node.js, empacotado como uma aplicação desktop Electron, que oferece uma base padronizada e pronta para desenvolvimento de APIs.
 
 ---
 
-# Objetivos
+## Sobre o projeto
 
-* Criar uma base padronizada para projetos backend.
-* Automatizar toda a configuração inicial.
-* Utilizar as ferramentas oficiais de cada stack.
-* Permitir evolução para novas stacks sem alterar a arquitetura.
-* Separar completamente a interface do motor de geração.
-* Suportar diferentes sistemas operacionais utilizando a mesma base de código.
+O **API Bootstrap** é uma aplicação desktop desenvolvida com Electron e React, projetada para simplificar o início de novos projetos de API backend em Node.js. Seu objetivo principal é fornecer uma estrutura de projeto padronizada e configurada, permitindo que os desenvolvedores foquem diretamente na lógica de negócio, em vez de gastar tempo com a configuração inicial. A ferramenta não visa gerar uma aplicação completa, mas sim uma base sólida e organizada para acelerar o desenvolvimento.
+
+**Principais características:**
+
+- **Geração de Projetos Padronizados**: Cria uma base consistente para APIs Node.js.
+
+- **Automatização da Configuração Inicial**: Lida com a configuração de dependências e estrutura de pastas.
+
+- **Suporte Multiplataforma**: Disponível para Windows, macOS e Linux, utilizando a mesma base de código.
+
+- **Interface Intuitiva**: Permite ao usuário definir o nome do projeto e o diretório de destino através de uma interface gráfica.
 
 ---
 
-# Estrutura do projeto
+## Tecnologias utilizadas
 
-```text
+O projeto API Bootstrap é construído com as seguintes tecnologias:
+
+- **Electron**: Framework para construir aplicações desktop multiplataforma com tecnologias web (HTML, CSS, JavaScript).
+
+- **React**: Biblioteca JavaScript para construção de interfaces de usuário interativas.
+
+- **Vite**: Ferramenta de build frontend que oferece uma experiência de desenvolvimento rápida.
+
+- **electron-builder**: Ferramenta para empacotar e distribuir aplicações Electron para diversas plataformas.
+
+- **Express.js**: (Utilizado no template gerado) Framework web minimalista e flexível para Node.js, usado para construir APIs.
+
+- **dotenv**: (Utilizado no template gerado) Módulo para carregar variáveis de ambiente de um arquivo `.env`.
+
+---
+
+## Arquitetura do projeto
+
+O API Bootstrap segue uma arquitetura baseada em Electron, que separa a aplicação em processos principal (main) e de renderização (renderer). A comunicação entre esses processos é feita via IPC (Inter-Process Communication).
+
+- **Processo Principal (Main)**: Gerencia a janela da aplicação, interações com o sistema operacional e o motor de geração de projetos.
+
+- **Processo de Renderização (Renderer)**: Responsável pela interface do usuário, desenvolvida em React.
+
+- **Core Generator**: Módulo central que orquestra a criação do projeto, carregando templates, substituindo variáveis e manipulando o sistema de arquivos.
+
+- **Platform Layer**: Uma camada de abstração que lida com operações específicas do sistema operacional (ex: abrir pastas, terminais), garantindo a compatibilidade multiplataforma.
+
+**Fluxo da Aplicação:**
+
+```
+React (Interface do Usuário)
+  ↓
+Electron IPC (Comunicação Interprocessos)
+  ↓
+Core Generator (Motor de Geração)
+  ↓
+Platform Layer (Operações de Sistema)
+  ↓
+Filesystem (Manipulação de Arquivos)
+  ↓
+Command Runner (Execução de Comandos)
+  ↓
+Projeto Criado
+```
+
+---
+
+## Estrutura de pastas
+
+A estrutura principal do projeto `api-bootstrap` é organizada da seguinte forma:
+
+```
 api-bootstrap/
 ├── build/ # Arquivos de build e ícones da aplicação
-├── resources/ # Recursos estáticos da aplicação, como ícones
+├── resources/ # Recursos estáticos da aplicação
 ├── src/
-│   ├── core/ # Módulos de lógica de negócio e serviços centrais
-│   │   ├── logger/ # Módulo para gerenciamento de logs
-│   │   └── system/ # Módulo para interações com o sistema operacional
+│   ├── core/ # Módulos de lógica de negócio e serviços centrais (logger, system, builder, templates)
 │   ├── main/ # Código do processo principal do Electron (backend)
 │   │   ├── ipc/ # Módulos para comunicação interprocessos (IPC)
 │   │   └── index.js # Ponto de entrada do processo principal
-│   ├── preload/ # Código do script de pré-carregamento do Electron
-│   │   └── index.js # Ponto de entrada do script de pré-carregamento
-│   └── renderer/ # Código do processo de renderização do Electron (frontend React)
-│       ├── src/ # Código-fonte da aplicação React
-│       │   ├── assets/ # Ativos estáticos como CSS e SVGs
-│       │   ├── components/ # Componentes React reutilizáveis
-│       │   ├── App.jsx # Componente principal da aplicação React
-│       │   └── main.jsx # Ponto de entrada da aplicação React
-│       └── index.html # Arquivo HTML principal da interface do usuário
-├── .editorconfig # Configurações para editores de texto
-├── .gitignore # Arquivos e diretórios a serem ignorados pelo Git
-├── .prettierignore # Arquivos e diretórios a serem ignorados pelo Prettier
-├── .prettierrc.yaml # Configurações do Prettier
-├── electron-builder.yml # Configurações do Electron Builder para empacotamento
-├── electron.vite.config.mjs # Configurações do Vite para Electron
-├── eslint.config.mjs # Configurações do ESLint
-├── package-lock.json # Bloqueio de dependências do npm
-└── package.json # Metadados do projeto e scripts de execução
+│   ├── preload/ # Script de pré-carregamento do Electron
+│   └── renderer/ # Código do processo de renderização (frontend React)
+│       ├── src/ # Código-fonte da aplicação React (assets, components, pages)
+│       └── index.html # Arquivo HTML principal da interface
+├── templates/ # Contém os templates de projetos a serem gerados (ex: express-js)
+│   └── express-js/
+│       ├── README.md
+│       ├── package.json
+│       ├── src/ # Código-fonte do template Express.js (app, config, controllers, etc.)
+│       └── template.json # Metadados do template
+├── package.json # Metadados do projeto principal e scripts de execução
+└── ... (outros arquivos de configuração como .eslintrc, .prettierrc, etc.)
 ```
 
 ---
 
-# Suporte Multiplataforma
+## Instalação e Execução
 
-O API Bootstrap será desenvolvido utilizando Electron, permitindo gerar projetos em diferentes sistemas operacionais utilizando a mesma base de código.
+Para configurar e executar o projeto API Bootstrap localmente, siga os passos abaixo:
 
-Sistemas suportados:
+### Pré-requisitos
 
-* Windows
-* macOS
-* Linux
+Certifique-se de ter o Node.js (versão 18 ou superior) e o npm (ou yarn) instalados em sua máquina.
 
-A maior parte do projeto será compartilhada entre todas as plataformas.
+### Instalação
 
-As diferenças específicas de cada sistema serão isoladas através de uma camada própria.
+1. **Clone o repositório:**
 
----
+   ```bash
+   git clone [URL_DO_REPOSITORIO]
+   cd api-bootstrap
+   ```
 
-# Platform Layer
+1. **Instale as dependências:**
 
-A camada de plataforma será responsável por funcionalidades dependentes do sistema operacional.
+   ```bash
+   npm install
+   # ou
+   yarn install
+   ```
 
-Estrutura:
+   O script `postinstall` executará automaticamente `electron-builder install-app-deps` para instalar as dependências específicas do Electron.
 
-```text
-core/
+### Execução
 
-platform/
+- **Modo de Desenvolvimento (com hot-reload):**
 
-├── index.js
-├── windows.js
-├── macos.js
-└── linux.js
-```
+   ```bash
+   npm run dev
+   ```
 
-Responsabilidades:
+- **Visualização (preview da build):**
 
-* Abrir pasta do projeto.
-* Abrir terminal.
-* Detectar ferramentas instaladas.
-* Verificar Node.js.
-* Verificar npm.
-* Verificar Git.
-* Executar comandos específicos do sistema.
+   ```bash
+   npm start
+   ```
 
----
+### Build da Aplicação
 
-## Interface de Plataforma
+Para gerar as versões empacotadas da aplicação para diferentes sistemas operacionais:
 
-O Core não executará comandos específicos diretamente.
+- **Build para Windows:**
 
-Exemplo incorreto:
+   ```bash
+   npm run build:win
+   ```
 
-```javascript
-exec("explorer .");
-```
+- **Build para macOS:**
 
-ou:
+   ```bash
+   npm run build:mac
+   ```
 
-```javascript
-exec("open .");
-```
+- **Build para Linux:**
 
-A aplicação utiliza uma interface única:
-
-```javascript
-platform.openFolder(path);
-
-platform.openTerminal();
-
-platform.checkNode();
-
-platform.checkGit();
-```
-
-Cada sistema possui sua própria implementação.
+   ```bash
+   npm run build:linux
+   ```
 
 ---
 
-## Exemplos
+## Banco de dados
 
-Windows:
+Atualmente, o template `express-js` gerado pelo API Bootstrap não inclui uma configuração de banco de dados pré-definida ou scripts de migration. No entanto, ele é projetado para ser facilmente integrado com qualquer sistema de gerenciamento de banco de dados (SQL ou NoSQL) e ORMs/ODMs de sua escolha. O uso de `dotenv` no template facilita a configuração de variáveis de ambiente para conexão com o banco de dados.
 
-```javascript
-class WindowsPlatform {
-
-    openFolder(path) {
-        exec(`explorer "${path}"`);
-    }
-
-}
-```
-
-macOS:
-
-```javascript
-class MacPlatform {
-
-    openFolder(path) {
-        exec(`open "${path}"`);
-    }
-
-}
-```
-
-Linux:
-
-```javascript
-class LinuxPlatform {
-
-    openFolder(path) {
-        exec(`xdg-open "${path}"`);
-    }
-
-}
-```
+**Nota:** O projeto API Bootstrap tem como objetivo futuro incluir opções de seleção de stack, banco de dados e modelagem inicial através da interface, conforme descrito na documentação de design. No entanto, essas funcionalidades ainda não estão implementadas na interface atual.
 
 ---
 
-# Gerenciamento de comandos
+## Funcionamento e Fluxos Principais
 
-Comandos executados pelo gerador também serão abstraídos.
+O fluxo de uso atual do API Bootstrap é o seguinte:
 
-Estrutura:
+1. **Preenchimento do Formulário**: O usuário informa o **Nome do Projeto** desejado.
 
-```text
-core/
+1. **Seleção de Pasta**: O usuário seleciona o diretório onde o projeto será criado.
 
-commands/
-
-├── CommandRunner.js
-├── npm.js
-├── git.js
-└── sequelize.js
-```
-
-Exemplo:
-
-```javascript
-commands.sequelize.init();
-```
-
-Internamente:
-
-```bash
-npx sequelize-cli init
-```
-
-Dessa forma, qualquer ajuste futuro fica isolado em um único local.
+1. **Geração**: Ao clicar em "Criar Projeto", a aplicação utiliza o template `express-js` (atualmente fixo) para gerar a estrutura da API no local especificado. Variáveis como `DESCRIPTION`, `AUTHOR` e `YEAR` são preenchidas com valores padrão ou baseados no nome do projeto.
 
 ---
 
-# Fluxo da aplicação
+## API e Endpoints
 
-```text
-React
+O projeto de API gerado a partir do template `express-js` inclui um endpoint básico para verificação de status:
 
-↓
+- **Módulo**: Geral
 
-Electron IPC
+- **Método + Rota**: `GET /`
 
-↓
+- **Descrição**: Retorna um JSON indicando o nome do projeto e seu status de execução. Exemplo de resposta:
 
-Core Generator
-
-↓
-
-Platform Layer
-
-↓
-
-Stack
-
-↓
-
-Features
-
-↓
-
-Filesystem
-
-↓
-
-Command Runner
-
-↓
-
-Projeto criado
-```
-
-A interface apenas coleta as informações do usuário.
-
-Toda a geração acontece dentro do Core.
+   ```json
+   {
+     "project": "my-api",
+     "status": "running"
+   }
+   ```
 
 ---
 
-# Build da aplicação
+## Scripts disponíveis
 
-O Electron permite gerar versões específicas para cada sistema operacional.
+### Scripts do Projeto Principal (API Bootstrap - Electron App)
 
-## Windows
+- `npm run format`: Formata o código utilizando Prettier.
 
-```bash
-npm run build:win
-```
+- `npm run lint`: Executa o linter (ESLint) para verificar problemas de código.
 
-Resultado:
+- `npm start`: Inicia a aplicação Electron em modo de visualização.
 
-```text
-API-Bootstrap.exe
-```
+- `npm run dev`: Inicia a aplicação Electron em modo de desenvolvimento com hot-reload.
 
----
+- `npm run build`: Compila a aplicação Electron.
 
-## macOS
+- `npm run postinstall`: Executa `electron-builder install-app-deps` após a instalação das dependências.
 
-```bash
-npm run build:mac
-```
+- `npm run build:unpack`: Compila e gera a aplicação sem empacotar.
 
-Resultado:
+- `npm run build:win`: Compila e gera o instalador para Windows.
 
-```text
-API-Bootstrap.dmg
-```
+- `npm run build:mac`: Compila e gera o instalador para macOS.
 
----
+- `npm run build:linux`: Compila e gera o instalador para Linux.
 
-## Linux
+### Scripts do Template Gerado (Express.js API)
 
-```bash
-npm run build:linux
-```
+- `npm run dev`: Inicia o servidor Express.js em modo de desenvolvimento com `node --watch`.
 
-Resultado:
-
-```text
-API-Bootstrap.AppImage
-```
+- `npm start`: Inicia o servidor Express.js em modo de produção.
 
 ---
 
-# Fluxo do usuário
+## Próximos passos (TODOs)
 
-## 1. Informações do projeto
+Com base na documentação de design do projeto, os seguintes recursos estão planejados para futuras versões:
 
-```text
-Nome
+- **Seleção de Stack**: Permitir ao usuário escolher entre diferentes stacks (ex: Node + Express + Prisma, Fastify + Prisma, NestJS).
 
-Autor
+- **Configuração de Banco de Dados**: Adicionar opções para selecionar e configurar bancos de dados (PostgreSQL, MySQL, SQLite, etc.) diretamente na interface.
 
-Versão
+- **Modelagem Inicial**: Funcionalidade para criar modelos e relacionamentos de banco de dados, gerando migrations e models correspondentes.
 
-Local onde será criado
+- **Seleção de Recursos**: Permitir a inclusão de recursos opcionais como JWT, Joi, Multer, Swagger, Docker, entre outros.
 
-Descrição (opcional)
-
-Gerar README
-```
+- **Geração de README para o projeto gerado**: Incluir a opção de gerar um README.md mais detalhado para o projeto de API recém-criado.
 
 ---
 
-## 2. Escolha da Stack
+## Licença
 
-Inicialmente apenas uma stack estará disponível.
-
-```text
-○ Node + Express + Sequelize
-
-○ Node + Express + Prisma (Em breve)
-
-○ Fastify + Prisma (Em breve)
-
-○ NestJS (Em breve)
-```
-
----
-
-## 3. Banco de dados
-
-Escolha do banco.
-
-```text
-○ PostgreSQL
-
-○ MySQL
-
-○ MariaDB
-
-○ SQLite
-```
-
-Configuração.
-
-```text
-Host
-
-Porta
-
-Usuário
-
-Senha
-
-Database
-```
-
-Também será possível testar a conexão antes da geração.
-
----
-
-## 4. Modelagem inicial
-
-O usuário poderá criar as tabelas da aplicação.
-
-Exemplo:
-
-```text
-Usuários
-
-id
-
-nome
-
-email
-
-senha
-```
-
-Depois:
-
-```text
-Pedidos
-
-id
-
-usuarioId
-
-valor
-```
-
-Relacionamentos:
-
-```text
-Usuários
-
-1 ---- N
-
-Pedidos
-```
-
-Essa modelagem será utilizada para gerar:
-
-* Models
-* Migrations
-* Foreign Keys
-
-Não serão gerados Controllers, Services ou Rotas.
-
----
-
-## 5. Recursos
-
-Os recursos serão independentes da stack.
-
-```text
-☑ JWT
-
-☑ Joi
-
-☐ Multer
-
-☑ Dotenv
-
-☑ Cors
-
-☑ Helmet
-
-☑ Morgan
-
-☐ Nodemailer
-
-☐ Swagger
-
-☐ Docker
-
-☑ ESLint
-
-☑ Prettier
-```
-
-Cada recurso conhece:
-
-* Dependências
-* Arquivos necessários
-* Alterações em arquivos existentes
-* Comandos a serem executados
-
----
-
-## 6. Resumo
-
-Antes da criação será apresentado um resumo.
-
-```text
-Projeto
-
-Stack
-
-Banco
-
-Modelos
-
-Features
-```
-
----
-
-## 7. Geração
-
-O usuário poderá acompanhar toda a geração em tempo real.
-
-```text
-✔ Criando projeto
-
-✔ Copiando template
-
-✔ Instalando dependências
-
-✔ Configurando banco
-
-✔ Criando models
-
-✔ Criando migrations
-
-✔ Configurando relacionamentos
-
-✔ Finalizando
-```
-
----
-
-# Core
-
-O Core será totalmente desacoplado da interface.
-
-## Generator
-
-Responsável por iniciar todo o processo.
-
-```javascript
-generator.generate(project)
-```
-
----
-
-## Project Builder
-
-Executa todas as etapas da geração.
-
-```text
-Criar pasta
-
-↓
-
-Copiar template
-
-↓
-
-Executar comandos
-
-↓
-
-Configurar banco
-
-↓
-
-Gerar models
-
-↓
-
-Instalar features
-
-↓
-
-Finalizar
-```
-
----
-
-## FileSystem
-
-Toda manipulação de arquivos passa por este módulo.
-
-```text
-copyFolder()
-
-createFolder()
-
-readFile()
-
-writeFile()
-
-replaceVariables()
-
-append()
-
-remove()
-```
-
-Nenhuma stack manipula arquivos diretamente.
-
----
-
-## Command Runner
-
-Executa comandos do terminal.
-
-```text
-run()
-
-runSync()
-
-runStreaming()
-```
-
-Exemplo:
-
-```javascript
-run("npm install");
-
-run("npx sequelize-cli init");
-```
-
----
-
-# Stacks
-
-Cada tecnologia possui seu próprio gerador.
-
-```text
-stacks/
-
-NodeExpressSequelize/
-
-NodeExpressPrisma/
-
-FastifyPrisma/
-```
-
-Cada stack implementa sua própria lógica.
-
-```text
-index.js
-
-packages.js
-
-generator.js
-
-database.js
-
-models.js
-```
-
-Exemplo para Sequelize:
-
-```text
-Criar projeto
-
-↓
-
-npm init
-
-↓
-
-Instalar dependências
-
-↓
-
-sequelize init
-
-↓
-
-Configurar banco
-
-↓
-
-Gerar models
-
-↓
-
-Gerar migrations
-```
-
-Exemplo para Prisma:
-
-```text
-Criar projeto
-
-↓
-
-npm init
-
-↓
-
-prisma init
-
-↓
-
-Editar schema.prisma
-
-↓
-
-prisma generate
-```
-
----
-
-# Features
-
-Os recursos opcionais serão totalmente independentes.
-
-```text
-features/
-
-JWT/
-
-Swagger/
-
-Docker/
-
-Joi/
-
-Multer/
-
-Cors/
-
-Helmet/
-
-Morgan/
-
-ESLint/
-
-Prettier/
-```
-
-Cada Feature possui sua própria estrutura.
-
-```text
-feature.json
-
-packages.js
-
-commands.js
-
-templates/
-
-patches.js
-```
-
-Exemplo do JWT:
-
-```text
-Instalar dependências
-
-↓
-
-Copiar middleware
-
-↓
-
-Copiar helper
-
-↓
-
-Modificar .env
-
-↓
-
-Modificar app.js
-```
-
----
-
-# Templates
-
-Os templates representam apenas a estrutura base da aplicação.
-
-```text
-templates/
-
-node-express-sequelize/
-
-src/
-
-config/
-
-routes/
-
-controllers/
-
-middlewares/
-
-services/
-
-repositories/
-
-helpers/
-
-utils/
-
-errors/
-
-database/
-
-package.json
-
-.gitignore
-
-.env.example
-```
-
-Os templates **não possuem recursos opcionais**.
-
-JWT, Docker, Swagger, ESLint e demais funcionalidades são adicionadas posteriormente pelas Features.
-
----
-
-# Modelo do Projeto
-
-Toda a geração será baseada em um único objeto.
-
-```javascript
-const project = {
-    name,
-    author,
-    version,
-    stack,
-    database,
-    features,
-    tables,
-    relations
-};
-```
-
-Todo o Core trabalha apenas com esse modelo.
-
----
-
-# Geração dos Models
-
-A geração utilizará o `sequelize-cli`.
-
-Para cada tabela:
-
-```text
-sequelize-cli model:generate
-```
-
-Depois o gerador realizará os ajustes necessários.
-
-* Model
-* Migration
-* Associations
-* Foreign Keys
-
----
-
-# Processo completo de geração
-
-Exemplo:
-
-```text
-Node
-
-↓
-
-Express
-
-↓
-
-Sequelize
-
-↓
-
-PostgreSQL
-
-↓
-
-JWT
-
-↓
-
-Swagger
-```
-
-Pipeline:
-
-```text
-Criar pasta
-
-↓
-
-Copiar template base
-
-↓
-
-npm install
-
-↓
-
-sequelize init
-
-↓
-
-Configurar banco
-
-↓
-
-Gerar models
-
-↓
-
-Gerar migrations
-
-↓
-
-Criar relacionamentos
-
-↓
-
-Instalar Features
-
-↓
-
-git init
-
-↓
-
-Projeto pronto
-```
-
----
-
-# Comunicação Electron
-
-Toda comunicação será feita via IPC.
-
-```text
-React
-
-↓
-
-window.electron.generateProject(project)
-
-↓
-
-IPC
-
-↓
-
-Generator
-
-↓
-
-Logs
-
-↓
-
-IPC
-
-↓
-
-Interface
-```
-
-Assim será possível acompanhar toda a geração em tempo real.
-
----
-
-## Próximas stacks
-
-A arquitetura foi projetada para suportar novas stacks sem alterações na interface.
-
-Planejamento inicial:
-
-* Node + Express + Sequelize
-* Node + Express + Prisma
-* Fastify + Prisma
-* NestJS
-
-Cada nova stack implementará apenas sua lógica específica, reutilizando todo o restante da infraestrutura do gerador.
+O projeto API Bootstrap é distribuído sob a licença **MIT**.
