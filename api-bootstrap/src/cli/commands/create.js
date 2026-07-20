@@ -1,16 +1,16 @@
 import ProjectBuilder from '../../core/builder/ProjectBuilder.js'
 
 export default async function createCommand(args) {
-  const [template, projectName] = args
+  const [stack, projectName] = args
 
-  if (!template || !projectName) {
-    throw new Error('Usage: create <template> <project-name>')
+  if (!stack || !projectName) {
+    throw new Error('Usage: create <stack> <project-name>')
   }
 
   const builder = new ProjectBuilder()
 
   const result = await builder.build({
-    template,
+    stack,
 
     destination: `./${projectName}`,
 

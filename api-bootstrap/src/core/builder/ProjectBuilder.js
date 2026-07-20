@@ -1,5 +1,5 @@
-import TemplateInstaller from '../templates/TemplateInstaller.js'
 import Logger from '../logger/Logger.js'
+import stacks from '../stacks/index.js'
 
 
 export default class ProjectBuilder {
@@ -9,7 +9,7 @@ export default class ProjectBuilder {
 
 
     const {
-      template,
+      stack: stackName,
       destination,
       variables = {}
     } = options
@@ -22,7 +22,7 @@ export default class ProjectBuilder {
 
 
     Logger.info(
-      `Template: ${template}`
+      `Stack: ${stackName}`
     )
 
 
@@ -32,15 +32,18 @@ export default class ProjectBuilder {
 
 
 
-    await TemplateInstaller.install({
-
-      template,
-
+    const Stack = stacks.get(stackName)
+    const stack = new Stack({
+      ...options,
+      stack: stackName,
       destination,
-
       variables
-
     })
+
+    await stack.create()
+    await stack.install()
+    await stack.configure()
+    await stack.generate()
 
 
 

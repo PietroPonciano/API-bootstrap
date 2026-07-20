@@ -1,9 +1,9 @@
 {
   "name": "api-bootstrap",
   "version": "1.0.0",
-  "description": "An Electron application with React",
+  "description": "Construindo APIs com excelência.",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "pietroponciano.com",
   "homepage": "https://electron-vite.org",
   "type": "module",
   "scripts": {
@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
-    "@electron-toolkit/utils": "^4.0.0"
+    "@electron-toolkit/utils": "^4.0.0",
+    "lucide-react": "^1.25.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",

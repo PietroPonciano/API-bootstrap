@@ -7,7 +7,7 @@ class TemplateLoader {
 
     static templatesDirectory = path.resolve(
         process.cwd(),
-        "templates"
+        "src/templates"
     );
 
     static async list() {
