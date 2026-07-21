@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Construindo APIs com excelência.",
   "main": "./out/main/index.js",
-  "author": "pietroponciano.com",
-  "homepage": "https://electron-vite.org",
+  "author": "PietroPonciano",
+  "homepage": "https://www.pietroponciano.com",
   "type": "module",
   "scripts": {
     "format": "prettier --write .",

@@ -1,14 +1,14 @@
 import path from "node:path";
+import { app } from "electron";
 
 import FileSystemService from "../filesystem/FileSystemService.js";
 import Template from "./Template.js";
 
 class TemplateLoader {
 
-    static templatesDirectory = path.resolve(
-        process.cwd(),
-        "src/templates"
-    );
+    static templatesDirectory = app.isPackaged
+    ? path.join(process.resourcesPath, "templates")
+    : path.resolve(process.cwd(), "templates");
 
     static async list() {
 
