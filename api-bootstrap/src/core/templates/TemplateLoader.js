@@ -1,73 +1,43 @@
-import path from "node:path";
-import { app } from "electron";
-
-import FileSystemService from "../filesystem/FileSystemService.js";
-import Template from "./Template.js";
+import path from 'node:path'
+import { app } from 'electron'
+import FileSystemService from '../filesystem/FileSystemService.js'
+import Template from './Template.js'
 
 class TemplateLoader {
 
-    static templatesDirectory = app.isPackaged
-    ? path.join(process.resourcesPath, "templates")
-    : path.resolve(process.cwd(), "templates");
+  static templatesDirectory = app.isPackaged
+    ? path.join(process.resourcesPath, 'templates')
+    : path.resolve(process.cwd(), 'templates')
 
-    static async list() {
+  static async list() {
+    const entries = await FileSystemService.readDirectory(this.templatesDirectory)
 
-        const entries =
-            await FileSystemService.readDirectory(
-                this.templatesDirectory
-            );
+    const templates = []
 
-        const templates = [];
+    for (const entry of entries) {
+      if (!entry.isDirectory()) {
+        continue
+      }
 
-        for (const entry of entries) {
-
-            if (!entry.isDirectory()) {
-                continue;
-            }
-
-            templates.push(
-                await this.load(entry.name)
-            );
-
-        }
-
-        return templates;
-
+      templates.push(await this.load(entry.name))
     }
 
-    static async load(templateId) {
+    return templates
+  }
 
-        const templatePath = path.join(
-            this.templatesDirectory,
-            templateId
-        );
+  static async load(templateId) {
+    const templatePath = path.join(this.templatesDirectory, templateId)
 
-        const metadataPath = path.join(
-            templatePath,
-            "template.json"
-        );
+    const metadataPath = path.join(templatePath, 'template.json')
 
-        if (!(await FileSystemService.exists(metadataPath))) {
-
-            throw new Error(
-                `Template "${templateId}" not found.`
-            );
-
-        }
-
-        const metadata = JSON.parse(
-            await FileSystemService.readFile(
-                metadataPath
-            )
-        );
-
-        return new Template(
-            templatePath,
-            metadata
-        );
-
+    if (!(await FileSystemService.exists(metadataPath))) {
+      throw new Error(`Template "${templateId}" not found.`)
     }
 
+    const metadata = JSON.parse(await FileSystemService.readFile(metadataPath))
+
+    return new Template(templatePath, metadata)
+  }
 }
 
-export default TemplateLoader;
+export default TemplateLoader

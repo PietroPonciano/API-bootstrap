@@ -7,25 +7,19 @@ const api = {
   },
 
   generator: {
-    generateProject: (project) =>
-      ipcRenderer.invoke('generator:create', project)
+    generateProject: (project) => ipcRenderer.invoke('generator:create', project),
+    testConnection: (project) => ipcRenderer.invoke('generator:test-connection', project)
   },
   dialog: {
-    selectFolder: () =>
-      ipcRenderer.invoke('dialog:selectFolder')
+    selectFolder: () => ipcRenderer.invoke('dialog:selectFolder')
   },
-  logger:{
-    onLog(callback){
-
-        ipcRenderer.on(
-            "logger:new",
-            (_,data)=>{
-                callback(data)
-            }
-        )
-
+  logger: {
+    onLog(callback) {
+      ipcRenderer.on('logger:new', (_, data) => {
+        callback(data)
+      })
     }
-}
+  }
 }
 
 if (process.contextIsolated) {

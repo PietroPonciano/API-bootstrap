@@ -90,7 +90,7 @@ export default function Home() {
           <span className="brand-mark"><img src={logo} alt="logo api boostrap" className='logo' /></span>
           <div>
             <strong>API Bootstrap</strong>
-            <small>Project studio</small>
+            <small>PietroPonciano</small>
           </div>
           <button
             type="button"
